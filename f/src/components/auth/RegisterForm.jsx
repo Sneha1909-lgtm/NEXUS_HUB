@@ -123,7 +123,7 @@ const RegisterForm = () => {
               {[
                 { id: 'STUDENT', label: 'Student', icon: User },
                 { id: 'FACULTY', label: 'Faculty', icon: ShieldCheck },
-                { id: 'WARDEN', label: 'Warden', icon: Lock }
+                { id: 'ADMIN', label: 'Admin', icon: Lock }
               ].map((role) => (
                 <button
                   key={role.id}
