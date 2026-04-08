@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import Card from '../components/ui/Card.jsx';
 import Badge from '../components/ui/Badge.jsx';
+import API_BASE_URL from '../config';
 
 const Overview = () => {
   const [user, setUser] = useState(null);
@@ -21,7 +22,7 @@ const Overview = () => {
     const endpoint = userData?.role === 'ADMIN' ? 'admin' : 
                      userData?.role === 'FACULTY' ? 'faculty' : 'student';
     
-    fetch(`http://localhost:5000/api/dashboard/${endpoint}`)
+    fetch(`${API_BASE_URL}/api/dashboard/${endpoint}`)
       .then(res => res.json())
       .then(json => {
         setData(json);

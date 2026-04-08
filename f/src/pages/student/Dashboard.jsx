@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import Badge from '../../components/ui/Badge.jsx';
 import Card from '../../components/ui/Card.jsx';
+import API_BASE_URL from '../../config';
 
 const Dashboard = () => {
   const [data, setData] = useState(null);
@@ -13,7 +14,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     // Identity Sync with Backend DTO
-    fetch('http://localhost:5000/api/dashboard/student')
+    fetch(`${API_BASE_URL}/api/dashboard/student`)
       .then(res => res.json())
       .then(json => {
         setData(json);
