@@ -6,7 +6,8 @@ const { User } = require('../models');
 
 // Register
 router.post('/register', async (req, res) => {
-  const { username, password, role, name } = req.body;
+  let { username, password, role, name } = req.body;
+  if (username) username = username.toLowerCase(); // Force lowercase for consistency
   try {
     const existingUser = await User.findOne({ where: { username } });
     if (existingUser) return res.status(400).json({ message: 'User already exists' });
@@ -34,14 +35,39 @@ router.post('/register', async (req, res) => {
 
 // Login
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
+  let { username, password } = req.body;
+  if (username) username = username.toLowerCase(); // Force lowercase for consistency
+
+  console.log(`\n🔑 [ AUTH ]: Login attempt for Node [ ${username} ]`);
+  
   try {
-    const user = await User.findOne({ where: { username } });
-    if (!user) return res.status(404).json({ message: '[ ERROR ]: Identity Node Not Found. Please verify Credentials.' });
+    // Try exact (normalized) match first
+    let user = await User.findOne({ where: { username } });
+    
+    // Fallback: Case-insensitive search if normalization failed for older records
+    if (!user) {
+      const { Op } = require('sequelize');
+      user = await User.findOne({ 
+        where: { 
+          username: { [Op.iLike]: username } 
+        } 
+      });
+    }
+    
+    if (!user) {
+      console.log(`❌ [ AUTH ]: Node [ ${username} ] - IDENTITY NOT FOUND`);
+      return res.status(404).json({ message: '[ ERROR ]: Identity Node Not Found. Please verify Credentials.' });
+    }
 
+    console.log(`📡 [ AUTH ]: Node [ ${username} ] - Found. Synchronizing Sequences...`);
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: '[ ERROR ]: Sequence Mismatch. Entry Denied.' });
+    
+    if (!isMatch) {
+      console.log(`❌ [ AUTH ]: Node [ ${username} ] - SEQUENCE MISMATCH`);
+      return res.status(400).json({ message: '[ ERROR ]: Sequence Mismatch. Entry Denied.' });
+    }
 
+    console.log(`✅ [ AUTH ]: Node [ ${username} ] - ACCESS GRANTED`);
     const token = jwt.sign(
       { id: user.id, role: user.role },
       process.env.JWT_SECRET || 'secret',
@@ -50,6 +76,7 @@ router.post('/login', async (req, res) => {
 
     res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
   } catch (err) {
+    console.error(`🚨 [ AUTH ]: CRITICAL ERROR - ${err.message}`);
     res.status(500).json({ error: err.message });
   }
 });

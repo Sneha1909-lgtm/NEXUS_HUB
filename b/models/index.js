@@ -18,25 +18,48 @@ if (isLocal) {
       host: process.env.DB_HOST || 'localhost',
       dialect: 'postgres',
       logging: false,
-      dialectOptions: {
-        // Explicitly ensuring NO SSL for local development
-      }
     }
   );
-  console.log('✅ Connecting to Local PostgreSQL (SSL: Disabled)');
+  console.log('📡 Connecting to Local PostgreSQL');
 } else {
-  // Cloud (Railway) Connection
-  sequelize = new Sequelize(process.env.DATABASE_URL, {
-    dialect: 'postgres',
-    logging: false,
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false
+  // Cloud (Railway) Connection - Ultra-Explicit Configuration Object
+  const dbUrl = process.env.DATABASE_URL;
+  const regex = /postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/;
+  const match = dbUrl.match(regex);
+
+  if (match) {
+    const [, user, password, host, port, database] = match;
+    sequelize = new Sequelize({
+      database: database,
+      username: user,
+      password: password,
+      host: host,
+      port: port,
+      dialect: 'postgres',
+      dialectModule: require('pg'),
+      protocol: 'postgres',
+      logging: false,
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false
+        }
       }
-    }
-  });
-  console.log('✅ Connecting to Cloud PostgreSQL (SSL: Enabled)');
+    });
+  } else {
+    sequelize = new Sequelize(dbUrl.replace('postgresql://', 'postgres://'), {
+      dialect: 'postgres',
+      dialectModule: require('pg'),
+      logging: false,
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false
+        }
+      }
+    });
+  }
+  console.log('📡 EXPLICIT-MODE: Cloud PostgreSQL (Verified Dialect: pg)');
 }
 
 

@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
+import { User, Lock, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import API_BASE_URL from '../../config';
 
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
@@ -30,11 +33,9 @@ const LoginForm = () => {
         throw new Error(data.message || 'Authentication failed');
       }
 
-      // Identity Sync with Real Database Data
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
-      // Role-Based Redirection Matrix
       navigate('/portal/overview');
     } catch (err) {
       if (err instanceof TypeError && err.message === 'Failed to fetch') {
@@ -42,25 +43,27 @@ const LoginForm = () => {
       } else {
         setError(err.message);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="glass p-10 lg:p-20 rounded-[3rem] border-primary/10 shadow-2xl relative overflow-hidden group">
+    <div className="glass p-6 sm:p-10 lg:p-20 rounded-[2rem] sm:rounded-[3rem] border-primary/10 shadow-2xl relative overflow-hidden group">
       <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-primary/20 transition-all duration-700" />
       
-      <div className="relative z-10 space-y-8">
-        <div className="space-y-4">
+      <div className="relative z-10 space-y-6 sm:y-8">
+        <div className="space-y-2 sm:space-y-4">
           <div className="flex items-center gap-3">
-            <ShieldCheck className="text-primary" size={24} />
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Security Protocol Activated</span>
+            <ShieldCheck className="text-primary" size={20} />
+            <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Security Protocol Activated</span>
           </div>
-          <h2 className="text-4xl font-display font-black uppercase italic tracking-tighter text-slate-900 dark:text-white">
+          <h2 className="text-3xl sm:text-4xl font-display font-black uppercase italic tracking-tighter text-slate-900 dark:text-white">
             Identify <span className="text-primary italic">Node.</span>
           </h2>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
           {error && (
             <div className="bg-red-600/10 border border-red-600/20 p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-600 animate-pulse text-center">
               [ ACCESS_DENIED ]: {error}
@@ -73,9 +76,10 @@ const LoginForm = () => {
               <input 
                 type="text" 
                 placeholder="Institutional ID..."
-                className="w-full bg-slate-50 dark:bg-white/5 border-2 border-primary/5 rounded-2xl py-5 pl-16 pr-6 outline-none focus:border-primary/40 focus:bg-white dark:focus:bg-white/10 transition-all font-bold tracking-tight"
+                className="w-full bg-slate-50 dark:bg-white/5 border-2 border-primary/5 rounded-2xl py-4 sm:py-5 pl-16 pr-6 outline-none focus:border-primary/40 focus:bg-white dark:focus:bg-white/10 transition-all font-bold tracking-tight text-sm sm:text-base"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                required
               />
             </div>
           </div>
@@ -85,20 +89,29 @@ const LoginForm = () => {
             <div className="relative">
               <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input 
-                type="password" 
+                type={showPassword ? "text" : "password"} 
                 placeholder="Security Sequence..."
-                className="w-full bg-slate-50 dark:bg-white/5 border-2 border-primary/5 rounded-2xl py-5 pl-16 pr-6 outline-none focus:border-primary/40 focus:bg-white dark:focus:bg-white/10 transition-all font-bold tracking-tight"
+                className="w-full bg-slate-50 dark:bg-white/5 border-2 border-primary/5 rounded-2xl py-4 sm:py-5 pl-16 pr-14 outline-none focus:border-primary/40 focus:bg-white dark:focus:bg-white/10 transition-all font-bold tracking-tight text-sm sm:text-base"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
+              <button 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
           <button 
             type="submit"
-            className="w-full bg-primary text-white py-6 rounded-2xl font-display font-black uppercase tracking-[0.4em] text-[10px] shadow-glow shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4 group/btn"
+            disabled={loading}
+            className="w-full bg-primary text-white py-4 sm:py-6 rounded-2xl font-display font-black uppercase tracking-[0.4em] text-[10px] shadow-glow shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4 group/btn disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Initiate Access Sync <ArrowRight className="group-hover/btn:translate-x-2 transition-transform" />
+            {loading ? 'Processing Sync...' : 'Initiate Access Sync'} <ArrowRight className="group-hover/btn:translate-x-2 transition-transform" />
           </button>
         </form>
 
@@ -124,12 +137,11 @@ const LoginForm = () => {
             <p className="text-[8px] text-center text-red-600/60 font-black uppercase tracking-widest mt-2">Pass-Key: password123</p>
           </div>
 
-          <a href="#" className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-colors italic mt-4">Lost Sequence?</a>
+          <a href="#" className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-colors italic mt-2">Lost Sequence?</a>
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
             No Identity? <Link to="/register" className="text-primary hover:underline">Enroll Now</Link>
           </p>
         </div>
-
       </div>
     </div>
   );

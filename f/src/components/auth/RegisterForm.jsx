@@ -11,10 +11,9 @@ const RegisterForm = () => {
     password: '',
     role: 'STUDENT'
   });
-  const navigate = useNavigate();
-
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -41,7 +40,6 @@ const RegisterForm = () => {
         throw new Error(data.message || 'Registration failed');
       }
 
-      // Auto-Login after registration
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
@@ -54,14 +52,14 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="glass p-10 lg:p-16 rounded-[3rem] border-primary/10 shadow-2xl relative overflow-hidden group">
-      <div className="relative z-10 space-y-6">
-        <div className="space-y-4">
+    <div className="glass p-6 sm:p-10 lg:p-16 rounded-[2rem] sm:rounded-[3rem] border-primary/10 shadow-2xl relative overflow-hidden group">
+      <div className="relative z-10 space-y-4 sm:space-y-6">
+        <div className="space-y-2 sm:space-y-4">
           <div className="flex items-center gap-3">
-            <UserPlus className="text-red-600" size={24} />
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Institutional Enrollment Process</span>
+            <UserPlus className="text-red-600" size={20} />
+            <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Institutional Enrollment Process</span>
           </div>
-          <h2 className="text-4xl font-black uppercase italic tracking-tighter text-slate-900 dark:text-white leading-none">
+          <h2 className="text-3xl sm:text-4xl font-black uppercase italic tracking-tighter text-slate-900 dark:text-white leading-none">
             Join the <span className="text-red-600 italic">Nexus.</span>
           </h2>
         </div>
@@ -80,8 +78,10 @@ const RegisterForm = () => {
                 <input 
                   type="text" 
                   placeholder="Full Name..."
-                  className="w-full bg-slate-50 dark:bg-white/5 border-2 border-red-500/5 rounded-2xl py-4 pl-14 pr-6 outline-none focus:border-red-600/40 transition-all font-bold text-sm"
+                  value={formData.name}
+                  className="w-full bg-slate-50 dark:bg-white/5 border-2 border-red-500/5 rounded-2xl py-3 sm:py-4 pl-14 pr-6 outline-none focus:border-red-600/40 transition-all font-bold text-sm"
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  required
                 />
               </div>
             </div>
@@ -93,8 +93,10 @@ const RegisterForm = () => {
                 <input 
                   type="text" 
                   placeholder="ID Number..."
-                  className="w-full bg-slate-50 dark:bg-white/5 border-2 border-red-500/5 rounded-2xl py-4 pl-14 pr-6 outline-none focus:border-red-600/40 transition-all font-bold text-sm"
+                  value={formData.id}
+                  className="w-full bg-slate-50 dark:bg-white/5 border-2 border-red-500/5 rounded-2xl py-3 sm:py-4 pl-14 pr-6 outline-none focus:border-red-600/40 transition-all font-bold text-sm"
                   onChange={(e) => setFormData({...formData, id: e.target.value})}
+                  required
                 />
               </div>
             </div>
@@ -107,8 +109,10 @@ const RegisterForm = () => {
               <input 
                 type="email" 
                 placeholder="Email Address..."
-                className="w-full bg-slate-50 dark:bg-white/5 border-2 border-red-500/5 rounded-2xl py-4 pl-14 pr-6 outline-none focus:border-red-600/40 transition-all font-bold text-sm"
+                value={formData.email}
+                className="w-full bg-slate-50 dark:bg-white/5 border-2 border-red-500/5 rounded-2xl py-3 sm:py-4 pl-14 pr-6 outline-none focus:border-red-600/40 transition-all font-bold text-sm"
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
+                required
               />
             </div>
           </div>
@@ -120,17 +124,20 @@ const RegisterForm = () => {
               <input 
                 type="password" 
                 placeholder="Password..."
-                className="w-full bg-slate-50 dark:bg-white/5 border-2 border-red-500/5 rounded-2xl py-4 pl-14 pr-6 outline-none focus:border-red-600/40 transition-all font-bold text-sm"
+                value={formData.password}
+                className="w-full bg-slate-50 dark:bg-white/5 border-2 border-red-500/5 rounded-2xl py-3 sm:py-4 pl-14 pr-6 outline-none focus:border-red-600/40 transition-all font-bold text-sm"
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
+                required
               />
             </div>
           </div>
 
           <button 
             type="submit"
-            className="w-full bg-red-600 text-white py-5 rounded-2xl font-black uppercase tracking-[0.4em] text-[10px] shadow-lg shadow-red-600/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4 group/btn"
+            disabled={loading}
+            className="w-full bg-red-600 text-white py-4 sm:py-5 rounded-2xl font-black uppercase tracking-[0.4em] text-[10px] shadow-lg shadow-red-600/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4 group/btn disabled:opacity-50"
           >
-            Request Enrollment Sync <ArrowRight className="group-hover/btn:translate-x-2 transition-transform" />
+            {loading ? 'Processing Sync...' : 'Request Enrollment Sync'} <ArrowRight className="group-hover/btn:translate-x-2 transition-transform" />
           </button>
         </form>
 
