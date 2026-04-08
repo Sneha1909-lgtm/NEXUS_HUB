@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import { ClipboardList, Filter, Clock, CheckCircle2, AlertTriangle, ChevronRight, Download } from 'lucide-react';
 import Card from '../../components/ui/Card.jsx';
 import Badge from '../../components/ui/Badge.jsx';
+import API_BASE_URL from '../../config';
 
 const Assignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/lms/assignments/1')
+    fetch(`${API_BASE_URL}/api/lms/assignments/1`)
       .then(res => res.json())
       .then(data => {
         const mappedData = data.map(a => ({

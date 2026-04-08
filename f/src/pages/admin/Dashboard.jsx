@@ -5,13 +5,14 @@ import {
 } from 'lucide-react';
 import Badge from '../../components/ui/Badge.jsx';
 import Card from '../../components/ui/Card.jsx';
+import API_BASE_URL from '../../config';
 
 const AdminDashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/dashboard/admin')
+    fetch(`${API_BASE_URL}/api/dashboard/admin`)
       .then(res => res.json())
       .then(json => {
         setData(json);

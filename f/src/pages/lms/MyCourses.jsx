@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import { PlayCircle, Clock, BarChart, ChevronRight, BookOpen, Globe, Award } from 'lucide-react';
 import Card from '../../components/ui/Card.jsx';
 import Badge from '../../components/ui/Badge.jsx';
+import API_BASE_URL from '../../config';
 
 const MyCourses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/lms/my-courses/1')
+    fetch(`${API_BASE_URL}/api/lms/my-courses/1`)
       .then(res => res.json())
       .then(data => {
         const mappedData = data.map(c => ({

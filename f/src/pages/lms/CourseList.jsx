@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Search, Filter, Star, Users, ArrowRight, Globe, Zap, Shield, BookOpen } from 'lucide-react';
 import Card from '../../components/ui/Card.jsx';
 import Badge from '../../components/ui/Badge.jsx';
+import API_BASE_URL from '../../config';
 
 const CourseList = () => {
   const [courses, setCourses] = useState([]);
@@ -13,7 +14,7 @@ const CourseList = () => {
   const categories = ['All Nodes', 'Computer Science', 'Data Flow', 'Neural Design', 'Management'];
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/lms/courses')
+    fetch(`${API_BASE_URL}/api/lms/courses`)
       .then(res => res.json())
       .then(data => {
         // Map database name to UI title
