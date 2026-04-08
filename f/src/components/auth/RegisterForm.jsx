@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Lock, Mail, CreditCard, ArrowRight, UserPlus } from 'lucide-react';
+import API_BASE_URL from '../../config';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -12,11 +13,44 @@ const RegisterForm = () => {
   });
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async (e) => {
     e.preventDefault();
-    console.log('Enrollment Sequence Initiated:', formData);
-    // Identity Persistence would go here
-    navigate('/login');
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          username: formData.id, 
+          password: formData.password, 
+          role: formData.role || 'STUDENT',
+          name: formData.name 
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration failed');
+      }
+
+      // Auto-Login after registration
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      navigate('/portal/overview');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -33,6 +67,11 @@ const RegisterForm = () => {
         </div>
 
         <form onSubmit={handleRegister} className="space-y-4">
+          {error && (
+            <div className="bg-red-600/10 border border-red-600/20 p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-600 animate-pulse text-center">
+              [ ENROLL_ERROR ]: {error}
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-4">Full Identity Name</label>

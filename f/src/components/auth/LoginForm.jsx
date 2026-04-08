@@ -37,7 +37,11 @@ const LoginForm = () => {
       // Role-Based Redirection Matrix
       navigate('/portal/overview');
     } catch (err) {
-      setError(err.message);
+      if (err instanceof TypeError && err.message === 'Failed to fetch') {
+        setError('[ SYSTEM_ERROR ]: Nexus Backend Offline. Please ensure the API server is running on port 5000.');
+      } else {
+        setError(err.message);
+      }
     }
   };
 
@@ -98,8 +102,29 @@ const LoginForm = () => {
           </button>
         </form>
 
-        <div className="flex flex-col items-center gap-4 pt-4">
-          <a href="#" className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-colors italic">Lost Sequence?</a>
+        <div className="flex flex-col items-center gap-4 pt-4 border-t border-slate-100 dark:border-white/5">
+          <div className="bg-slate-50 dark:bg-white/5 rounded-2xl p-4 w-full space-y-2 border border-slate-100 dark:border-white/5">
+            <span className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 block text-center">Available Demo Nodes:</span>
+            <div className="flex justify-around items-center">
+              <div className="text-center">
+                <p className="text-[10px] font-bold text-slate-900 dark:text-white leading-none">admin</p>
+                <p className="text-[8px] text-slate-400 uppercase">Admin</p>
+              </div>
+              <div className="h-6 w-px bg-slate-200 dark:bg-white/10" />
+              <div className="text-center">
+                <p className="text-[10px] font-bold text-slate-900 dark:text-white leading-none">faculty1</p>
+                <p className="text-[8px] text-slate-400 uppercase">Faculty</p>
+              </div>
+              <div className="h-6 w-px bg-slate-200 dark:bg-white/10" />
+              <div className="text-center">
+                <p className="text-[10px] font-bold text-slate-900 dark:text-white leading-none">student1</p>
+                <p className="text-[8px] text-slate-400 uppercase">Student</p>
+              </div>
+            </div>
+            <p className="text-[8px] text-center text-red-600/60 font-black uppercase tracking-widest mt-2">Pass-Key: password123</p>
+          </div>
+
+          <a href="#" className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-colors italic mt-4">Lost Sequence?</a>
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
             No Identity? <Link to="/register" className="text-primary hover:underline">Enroll Now</Link>
           </p>
