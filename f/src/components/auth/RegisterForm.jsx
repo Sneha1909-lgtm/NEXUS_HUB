@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Lock, Mail, CreditCard, ArrowRight, UserPlus } from 'lucide-react';
+import { User, Lock, Mail, CreditCard, ArrowRight, UserPlus, ShieldCheck } from 'lucide-react';
 import API_BASE_URL from '../../config';
 
 const RegisterForm = () => {
@@ -114,6 +114,31 @@ const RegisterForm = () => {
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
                 required
               />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-4">Identity Classification</label>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { id: 'STUDENT', label: 'Student', icon: User },
+                { id: 'FACULTY', label: 'Faculty', icon: ShieldCheck },
+                { id: 'WARDEN', label: 'Warden', icon: Lock }
+              ].map((role) => (
+                <button
+                  key={role.id}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, role: role.id })}
+                  className={`flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all ${
+                    formData.role === role.id 
+                      ? 'border-red-600 bg-red-600/10 text-red-600' 
+                      : 'border-slate-100 dark:border-white/5 text-slate-400 hover:border-red-600/20'
+                  }`}
+                >
+                  <role.icon size={16} />
+                  <span className="text-[8px] font-black uppercase tracking-widest">{role.label}</span>
+                </button>
+              ))}
             </div>
           </div>
 
