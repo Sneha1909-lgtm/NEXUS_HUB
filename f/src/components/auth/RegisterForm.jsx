@@ -30,11 +30,13 @@ const RegisterForm = () => {
           username: formData.id, 
           password: formData.password, 
           role: formData.role || 'STUDENT',
-          name: formData.name 
+          name: formData.name,
+          email: formData.email
         }),
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : {};
 
       if (!response.ok) {
         throw new Error(data.message || 'Registration failed');

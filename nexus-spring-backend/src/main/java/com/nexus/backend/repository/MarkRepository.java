@@ -1,0 +1,9 @@
+package com.nexus.backend.repository;
+
+import com.nexus.backend.model.Mark;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+
+public interface MarkRepository extends JpaRepository<Mark, Long> {
+    List<Mark> findByStudentId(Long studentId);
+}

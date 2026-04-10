@@ -3,6 +3,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, AreaChart, Area, XAx
 import { CheckCircle2, XCircle, AlertCircle, Calendar, TrendingUp, Filter, Download } from 'lucide-react';
 import Card from '../../components/ui/Card.jsx';
 import Badge from '../../components/ui/Badge.jsx';
+import API_BASE_URL from '../../config';
 
 const StudentAttendance = () => {
   const [subjects, setSubjects] = useState([]);
@@ -22,7 +23,7 @@ const StudentAttendance = () => {
   ];
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/lms/attendance/1')
+    fetch(`${API_BASE_URL}/api/lms/attendance/1`)
       .then(res => res.json())
       .then(data => {
         // We need to group by subject name since the backend returns individual records
