@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import Login from './pages/Login.jsx';
 import DashboardLayout from './layouts/DashboardLayout.jsx';
 import StudentAcademic from './pages/student/Academic';
@@ -62,6 +63,7 @@ function App() {
             <Route path="lms/instructor/courses" element={<LmsInstructorCourses />} />
           </Route>
         </Routes>
+        <Analytics />
       </Router>
     </ThemeProvider>
   );
