@@ -238,20 +238,22 @@ public class DataSeeder implements CommandLineRunner {
                         studentRepository.save(student);
                     }
 
-                    if (enrollmentRepository.count() < 12) {
+                    if (enrollmentRepository.findByStudentId(student.getId()).isEmpty()) {
                         enrollmentRepository.save(com.nexus.backend.model.Enrollment.builder().student(student).course(c1).progress((int)(20 + Math.random() * 60)).status("Ongoing").build());
                         enrollmentRepository.save(com.nexus.backend.model.Enrollment.builder().student(student).course(c2).progress((int)(10 + Math.random() * 40)).status("Ongoing").build());
                     }
 
-                    if (markRepository.count() < 15) {
-                        markRepository.save(com.nexus.backend.model.Mark.builder().student(student).subject(s1).marks((int)(70 + Math.random() * 25)).grade("A").build());
-                        markRepository.save(com.nexus.backend.model.Mark.builder().student(student).subject(s3).marks((int)(60 + Math.random() * 30)).grade("B+").build());
-                        markRepository.save(com.nexus.backend.model.Mark.builder().student(student).subject(s4).marks((int)(65 + Math.random() * 20)).grade("B").build());
-                        markRepository.save(com.nexus.backend.model.Mark.builder().student(student).subject(s5).marks((int)(80 + Math.random() * 15)).grade("A+").build());
-                        markRepository.save(com.nexus.backend.model.Mark.builder().student(student).subject(s7).marks((int)(50 + Math.random() * 40)).grade("B-").build());
+                    if (student.getUser().getUsername().equals("student1") && markRepository.count() < 100) {
+                        try {
+                           markRepository.save(com.nexus.backend.model.Mark.builder().student(student).subject(s1).marks((int)(70 + Math.random() * 25)).grade("A").build());
+                           markRepository.save(com.nexus.backend.model.Mark.builder().student(student).subject(s3).marks((int)(60 + Math.random() * 30)).grade("B+").build());
+                           markRepository.save(com.nexus.backend.model.Mark.builder().student(student).subject(s4).marks((int)(65 + Math.random() * 20)).grade("B").build());
+                           markRepository.save(com.nexus.backend.model.Mark.builder().student(student).subject(s5).marks((int)(80 + Math.random() * 15)).grade("A+").build());
+                           markRepository.save(com.nexus.backend.model.Mark.builder().student(student).subject(s7).marks((int)(50 + Math.random() * 40)).grade("B-").build());
+                        } catch (Exception e) {}
                     }
 
-                    if (attendanceRepository.count() < 30) {
+                    if (attendanceRepository.findByStudentId(student.getId()).isEmpty()) {
                         attendanceRepository.save(com.nexus.backend.model.Attendance.builder().student(student).subject(s1).date(java.time.LocalDate.now().minusDays(1)).status(com.nexus.backend.model.AttendanceStatus.PRESENT).build());
                         attendanceRepository.save(com.nexus.backend.model.Attendance.builder().student(student).subject(s2).date(java.time.LocalDate.now().minusDays(3)).status(com.nexus.backend.model.AttendanceStatus.ABSENT).build());
                         attendanceRepository.save(com.nexus.backend.model.Attendance.builder().student(student).subject(s5).date(java.time.LocalDate.now().minusDays(2)).status(com.nexus.backend.model.AttendanceStatus.PRESENT).build());

@@ -10,7 +10,8 @@ const MyCourses = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/lms/my-courses/1`)
+    const user = JSON.parse(localStorage.getItem('user'));
+    fetch(`${API_BASE_URL}/api/lms/my-courses/${user?.username || 'student1'}`)
       .then(res => res.json())
       .then(data => {
         const mappedData = data.map(c => ({

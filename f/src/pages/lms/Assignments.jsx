@@ -10,7 +10,8 @@ const Assignments = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/lms/assignments/1`)
+    const user = JSON.parse(localStorage.getItem('user'));
+    fetch(`${API_BASE_URL}/api/lms/assignments/${user?.username || 'student1'}`)
       .then(res => res.json())
       .then(data => {
         const mappedData = data.map(a => ({
