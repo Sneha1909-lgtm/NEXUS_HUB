@@ -41,11 +41,8 @@ const RegisterForm = () => {
       if (!response.ok) {
         throw new Error(data.message || 'Registration failed');
       }
-
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
       
-      navigate('/portal/overview');
+      navigate('/login');
     } catch (err) {
       setError(err.message);
     } finally {
