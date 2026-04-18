@@ -15,6 +15,8 @@ import LmsQuiz from './pages/lms/Quiz';
 import LmsInstructorCourses from './pages/lms/InstructorCourses';
 import FacultyEnterMarks from './pages/faculty/EnterMarks';
 import AdminUserManagement from './pages/admin/Users';
+import AdminCourses from './pages/admin/Courses.jsx';
+import AdminReports from './pages/lms/AdminReports.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import HomePage from './pages/HomePage.jsx';
 import Register from './pages/Register.jsx';
@@ -52,7 +54,9 @@ function App() {
             <Route path="faculty/marks" element={<FacultyEnterMarks />} />
             
             <Route path="admin/users" element={<AdminUserManagement />} />
+            <Route path="admin/courses" element={<AdminCourses />} />
             
+            <Route path="lms/admin/reports" element={<AdminReports />} />
             <Route path="lms/student/courses" element={<LmsMyCourses />} />
             <Route path="lms/student/assignments" element={<LmsAssignments />} />
             <Route path="lms/global/courses" element={<LmsCourseList />} />

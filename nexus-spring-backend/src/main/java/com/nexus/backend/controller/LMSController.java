@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/lms")
@@ -17,6 +20,18 @@ public class LMSController {
 
     @Autowired
     private EnrollmentRepository enrollmentRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
+    private AssignmentRepository assignmentRepository;
+
+    @Autowired
+    private AttendanceRepository attendanceRepository;
 
     @GetMapping("/courses")
     public ResponseEntity<List<Course>> getAllCourses() {
@@ -30,36 +45,80 @@ public class LMSController {
 
     @GetMapping("/my-courses/{studentId}")
     public ResponseEntity<?> getMyCourses(@PathVariable String studentId) {
-        List<java.util.Map<String, Object>> courses = java.util.Arrays.asList(
-            java.util.Map.of("id", 1, "name", "Advanced React Architecture", "instructor", "Dr. Sarah Smith", "image", "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80", "progress", 65, "status", "In Sync", "lessons", 24),
-            java.util.Map.of("id", 2, "name", "Cloud Infrastructure with AWS", "instructor", "Prof. James Cooper", "image", "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80", "progress", 90, "status", "Optimal", "lessons", 30),
-            java.util.Map.of("id", 3, "name", "Database Management Systems", "instructor", "Dr. Alan Turing", "image", "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?q=80", "progress", 45, "status", "Warning", "lessons", 18)
-        );
-        return ResponseEntity.ok(courses);
+        Student student = resolveStudent(studentId);
+        if (student == null) return ResponseEntity.notFound().build();
+
+        List<Enrollment> enrollments = enrollmentRepository.findByStudentId(student.getId());
+        List<Map<String, Object>> response = new ArrayList<>();
+        
+        for (Enrollment e : enrollments) {
+            Course c = e.getCourse();
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", c.getId());
+            map.put("name", c.getName());
+            map.put("instructor", c.getInstructor());
+            map.put("image", c.getImage() != null ? c.getImage() : "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80");
+            map.put("progress", e.getProgress());
+            map.put("status", e.getStatus());
+            map.put("lessons", 24); // standard structure mock wrapper for UI
+            response.add(map);
+        }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/assignments/{studentId}")
     public ResponseEntity<?> getAssignments(@PathVariable String studentId) {
-        List<java.util.Map<String, Object>> assignments = java.util.Arrays.asList(
-            java.util.Map.of("id", 1, "title", "React state management", "Course", java.util.Map.of("name", "Advanced React Architecture"), "priority", "High", "deadline", "2024-05-15T23:59:00", "status", "PENDING"),
-            java.util.Map.of("id", 2, "title", "AWS deployment setup", "Course", java.util.Map.of("name", "Cloud Infrastructure with AWS"), "priority", "Medium", "deadline", "2024-05-20T23:59:00", "status", "SUBMITTED"),
-            java.util.Map.of("id", 3, "title", "SQL Normalization", "Course", java.util.Map.of("name", "Database Management Systems"), "priority", "High", "deadline", "2024-05-25T23:59:00", "status", "PENDING")
-        );
-        return ResponseEntity.ok(assignments);
+        Student student = resolveStudent(studentId);
+        if (student == null) return ResponseEntity.notFound().build();
+
+        List<Enrollment> enrollments = enrollmentRepository.findByStudentId(student.getId());
+        List<Map<String, Object>> response = new ArrayList<>();
+        
+        List<Assignment> allAssignments = assignmentRepository.findAll();
+        for (Enrollment e : enrollments) {
+            for (Assignment a : allAssignments) {
+                if (a.getCourse().getId().equals(e.getCourse().getId())) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", a.getId());
+                    map.put("title", a.getTitle());
+                    map.put("Course", Map.of("name", a.getCourse().getName()));
+                    map.put("priority", a.getPriority());
+                    map.put("deadline", a.getDeadline().toString());
+                    map.put("status", a.getStatus());
+                    response.add(map);
+                }
+            }
+        }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/attendance/{studentId}")
     public ResponseEntity<?> getAttendance(@PathVariable String studentId) {
-        List<java.util.Map<String, Object>> attendance = java.util.Arrays.asList(
-            java.util.Map.of("Subject", java.util.Map.of("name", "Advanced React Architecture"), "status", "PRESENT"),
-            java.util.Map.of("Subject", java.util.Map.of("name", "Advanced React Architecture"), "status", "PRESENT"),
-            java.util.Map.of("Subject", java.util.Map.of("name", "Advanced React Architecture"), "status", "ABSENT"),
-            java.util.Map.of("Subject", java.util.Map.of("name", "Cloud Infrastructure with AWS"), "status", "PRESENT"),
-            java.util.Map.of("Subject", java.util.Map.of("name", "Cloud Infrastructure with AWS"), "status", "PRESENT"),
-            java.util.Map.of("Subject", java.util.Map.of("name", "Cloud Infrastructure with AWS"), "status", "PRESENT"),
-            java.util.Map.of("Subject", java.util.Map.of("name", "Database Management Systems"), "status", "ABSENT"),
-            java.util.Map.of("Subject", java.util.Map.of("name", "Database Management Systems"), "status", "PRESENT")
-        );
-        return ResponseEntity.ok(attendance);
+        Student student = resolveStudent(studentId);
+        if (student == null) return ResponseEntity.notFound().build();
+
+        List<Attendance> attendances = attendanceRepository.findByStudentId(student.getId());
+        List<Map<String, Object>> response = new ArrayList<>();
+        for (Attendance a : attendances) {
+             Map<String, Object> map = new HashMap<>();
+             map.put("Subject", Map.of("name", a.getSubject().getName()));
+             map.put("status", a.getStatus().name());
+             map.put("date", a.getDate().toString());
+             response.add(map);
+        }
+        return ResponseEntity.ok(response);
+    }
+    
+    private Student resolveStudent(String identifier) {
+        try {
+            Long id = Long.parseLong(identifier);
+            return studentRepository.findByUserId(id).orElse(studentRepository.findById(id).orElse(null));
+        } catch (NumberFormatException e) {
+            User user = userRepository.findByUsername(identifier).orElse(null);
+            if (user != null) {
+                return studentRepository.findByUser(user).orElse(null);
+            }
+        }
+        return null;
     }
 }
